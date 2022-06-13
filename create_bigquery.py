@@ -8,16 +8,13 @@ import pandas_gbq
 import sys
 
 def df_import(csv_file):
-    poke_df = pd.read_csv(csv_file, index_col="english_name")
+    poke_df = pd.read_csv(csv_file)
     return poke_df
-
-poke_df = df_import('pokemon.csv')
 
 def df_drop_add(dataframe):
     """
     ## df_drop_add(dataframe)
     removes a specific list of columns & adds a 'wins' and 'losses' column
-
     *dataframe:
     - takes a pandas dataframe
     """
@@ -50,11 +47,11 @@ def df_drop_add(dataframe):
         if col not in dataframe.columns:
             dataframe['wins']=0
             dataframe['losses']=0
-            dataframe['times_chosen']
+            dataframe['times_chosen']=0
         else:
             pass
     return dataframe
- 
+
 
 logging.basicConfig(format='[%(levelname)-5s][%(asctime)s][%(module)s:%(lineno)04d] : %(message)s',
                     level=INFO,
@@ -83,7 +80,7 @@ def load_to_gbq() -> None:
     project_id = "deb-01-346205"
     # dataset to insert the table into
     table_id = "poke_battler_data.pokemon"
-
+    poke_df = df_import('pokemon.csv')
     # Loading transformed dataframe into google big query with the specified project/dataset as targets and a specified table schema.
     logger.info(f"Loading dataframe to: '{dataset.dataset_id}'...")
     poke_df = df_drop_add(poke_df) 
@@ -129,7 +126,8 @@ def load_to_gbq() -> None:
         {'name': 'is_mythical', 'type': 'INT64'},
         {'name': 'description', 'type': 'STRING'},
         {'name': 'wins', 'type': 'INT64'},
-        {'name': 'losses', 'type': 'INT64'}])
+        {'name': 'losses', 'type': 'INT64'},
+        {'name': 'times_chosen', 'type': 'INT64'}])
     logger.info(f"Successfully loaded dataframe into '{dataset.dataset_id}'.")
 
 load_to_gbq()
